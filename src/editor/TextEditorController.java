@@ -6,7 +6,7 @@ public class TextEditorController {
     private TextEditorModel model;
 
     public void setView (TextEditorView view) {
-        view.setLoadButtonListener( e -> {
+        view.setLoadActionListener(e -> {
             var fileName = view.getFileName();
             try {
                 var text = model.loadTextFile(fileName);
@@ -16,11 +16,13 @@ public class TextEditorController {
             }
         });
 
-        view.setSaveButtonListener(actionEvent -> {
+        view.setSaveActionListener(actionEvent -> {
             var fileName = view.getFileName();
             var text = view.getText();
             model.saveTextFile(fileName, text);
         });
+
+        view.setCloseActionListener(actionEvent -> view.closeView());
 
     }
 

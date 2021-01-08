@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 public class TextEditor extends JFrame implements TextEditorView {
     private static final TextEditorController CONTROLLER = new TextEditorController();
+    private final TextEditorMenu actionMenu;
     private ScrollableTextArea scrollableTextArea;
     private FileActionsPanel fileActionsPanel;
 
@@ -22,6 +23,10 @@ public class TextEditor extends JFrame implements TextEditorView {
         add(scrollableTextArea, BorderLayout.CENTER);
         scrollableTextArea.setLocation(25, 25);
 
+        actionMenu = new TextEditorMenu();
+        setJMenuBar(new JMenuBar());
+        getJMenuBar().add(actionMenu);
+
         CONTROLLER.setView(this);
         CONTROLLER.setModel(new UserDirectory());
 
@@ -29,13 +34,17 @@ public class TextEditor extends JFrame implements TextEditorView {
     }
 
     @Override
-    public void setLoadButtonListener(ActionListener listener) {
+    public void setLoadActionListener(ActionListener listener) {
+
         fileActionsPanel.addLoadButtonListener(listener);
+        actionMenu.addLoadMenuItemListener(listener);
     }
 
     @Override
-    public void setSaveButtonListener(ActionListener listener) {
+    public void setSaveActionListener(ActionListener listener) {
+
         fileActionsPanel.addSaveButtonListener(listener);
+        actionMenu.addSaveMenuItemListener(listener);
     }
 
     @Override
@@ -51,6 +60,17 @@ public class TextEditor extends JFrame implements TextEditorView {
     @Override
     public String getFileName() {
         return fileActionsPanel.getFileName();
+    }
+
+    @Override
+    public void setCloseActionListener(ActionListener listener) {
+        actionMenu.addExitMenuItemListener(listener);
+    }
+
+    @Override
+    public void closeView() {
+        dispose();
+        System.exit(0);
     }
 }
 

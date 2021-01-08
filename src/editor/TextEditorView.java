@@ -4,13 +4,17 @@ import java.awt.event.ActionListener;
 
 public interface TextEditorView {
 
-    void setLoadButtonListener(ActionListener listener);
+    void setLoadActionListener(ActionListener listener);
 
-    void setSaveButtonListener(ActionListener listener);
+    void setSaveActionListener(ActionListener listener);
 
     void setText(String text);
 
     String getText();
 
     String getFileName();
+
+    void closeView();
+
+    void setCloseActionListener(ActionListener listener);
 }
