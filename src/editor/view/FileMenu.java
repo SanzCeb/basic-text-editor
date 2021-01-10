@@ -1,20 +1,20 @@
-package editor;
+package editor.view;
 
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
 
-public class TextEditorMenu extends JMenu {
+public class FileMenu extends JMenu {
     private final JMenuItem loadMenuItem;
     private final JMenuItem saveMenuItem;
     private final JMenuItem exitMenuItem;
 
-    public TextEditorMenu() {
+    public FileMenu() {
         super("File");
         setName("MenuFile");
 
-        loadMenuItem = new JMenuItem("Load");
-        loadMenuItem.setName("MenuLoad");
+        loadMenuItem = new JMenuItem("Open");
+        loadMenuItem.setName("MenuOpen");
         saveMenuItem = new JMenuItem("Save");
         saveMenuItem.setName("MenuSave");
         exitMenuItem = new JMenuItem("Exit");

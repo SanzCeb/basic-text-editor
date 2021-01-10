@@ -1,8 +1,10 @@
 package editor;
 
-import java.io.IOException;
+import java.nio.file.Path;
 
 public interface TextEditorModel {
-    void saveTextFile(String filename, String text);
-    String loadTextFile(String Filename) throws IOException;
+    void saveTextFile(Path path, String text);
+
+    String loadTextFile(Path path);
+
 }

@@ -1,28 +1,32 @@
 package editor;
 
-import java.io.IOException;
+import editor.view.TextEditorView;
+
+import java.nio.file.Path;
+import java.util.Optional;
 
 public class TextEditorController {
     private TextEditorModel model;
+    private Optional<Path> optionalPath = Optional.empty();
 
     public void setView (TextEditorView view) {
+
         view.setLoadActionListener(e -> {
-            var fileName = view.getFileName();
-            try {
-                var text = model.loadTextFile(fileName);
-                view.setText(text);
-            } catch (IOException ioException) {
-                view.setText("");
-            }
+            optionalPath = view.getOpenPath();
+            optionalPath.ifPresent(path -> {
+                view.setText(model.loadTextFile(path));
+            });
         });
 
         view.setSaveActionListener(actionEvent -> {
-            var fileName = view.getFileName();
-            var text = view.getText();
-            model.saveTextFile(fileName, text);
+            optionalPath = view.getSavePath();
+            optionalPath.ifPresent(path -> {
+                var text = view.getText();
+                model.saveTextFile(path, text);
+            });
         });
 
-        view.setCloseActionListener(actionEvent -> view.closeView());
+
 
     }
 

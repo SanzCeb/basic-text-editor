@@ -1,35 +1,51 @@
 package editor;
 
+import editor.view.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
+import java.util.Optional;
 
 public class TextEditor extends JFrame implements TextEditorView {
     private static final TextEditorController CONTROLLER = new TextEditorController();
-    private final TextEditorMenu actionMenu;
+    private final FileMenu fileMenu = new FileMenu();
+    private final SearchMenu searchMenu = new SearchMenu();
     private ScrollableTextArea scrollableTextArea;
     private FileActionsPanel fileActionsPanel;
+    private TextEditorFileChooser fileChooser = new TextEditorFileChooser();
 
     public TextEditor() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 400);
+        setSize(500, 400);
         setTitle("Text Editor");
         setLayout(new BorderLayout());
         setResizable(false);
 
-        scrollableTextArea = new ScrollableTextArea(new TextArea());
+        scrollableTextArea = new ScrollableTextArea();
         fileActionsPanel = new FileActionsPanel();
         add(fileActionsPanel, BorderLayout.NORTH);
+        add(fileChooser, BorderLayout.CENTER);
         add(scrollableTextArea, BorderLayout.CENTER);
         scrollableTextArea.setLocation(25, 25);
 
-        actionMenu = new TextEditorMenu();
         setJMenuBar(new JMenuBar());
-        getJMenuBar().add(actionMenu);
+        getJMenuBar().add(fileMenu);
+        getJMenuBar().add(searchMenu);
 
         CONTROLLER.setView(this);
-        CONTROLLER.setModel(new UserDirectory());
+        CONTROLLER.setModel(new Text());
 
+        fileMenu.addExitMenuItemListener(e -> {
+            dispose();
+            System.exit(0);
+        });
+
+        setStartSearchListener();
+        setPreviousMatchListener();
+        setNextMatchListener();
+        setUseRegExListener();
         setVisible(true);
     }
 
@@ -37,17 +53,16 @@ public class TextEditor extends JFrame implements TextEditorView {
     public void setLoadActionListener(ActionListener listener) {
 
         fileActionsPanel.addLoadButtonListener(listener);
-        actionMenu.addLoadMenuItemListener(listener);
+        fileMenu.addLoadMenuItemListener(listener);
     }
 
     @Override
     public void setSaveActionListener(ActionListener listener) {
 
         fileActionsPanel.addSaveButtonListener(listener);
-        actionMenu.addSaveMenuItemListener(listener);
+        fileMenu.addSaveMenuItemListener(listener);
     }
 
-    @Override
     public void setText(String text) {
         scrollableTextArea.setText(text);
     }
@@ -58,20 +73,45 @@ public class TextEditor extends JFrame implements TextEditorView {
     }
 
     @Override
-    public String getFileName() {
-        return fileActionsPanel.getFileName();
+    public Optional<Path> getOpenPath() {
+        return fileChooser.openFile();
     }
 
     @Override
-    public void setCloseActionListener(ActionListener listener) {
-        actionMenu.addExitMenuItemListener(listener);
+    public Optional<Path> getSavePath() {
+        return fileChooser.saveFile();
     }
 
-    @Override
-    public void closeView() {
-        dispose();
-        System.exit(0);
+    private void setStartSearchListener() {
+        ActionListener listener = e -> {
+            var searchField = fileActionsPanel.getSearchField();
+            var regex = fileActionsPanel.getRegex();
+            scrollableTextArea.search(searchField, regex);
+        };
+        fileActionsPanel.addStartSearchButtonListener(listener);
+        searchMenu.addStartSearchMenuItemListener(listener);
     }
+
+    private void setPreviousMatchListener() {
+        ActionListener listener = e -> scrollableTextArea.previousMatch();
+        fileActionsPanel.addPreviousMatchButtonListener(listener);
+        searchMenu.addPreviousMatchMenuItemListener(listener);
+    }
+
+
+    private void setNextMatchListener() {
+        ActionListener listener = e -> scrollableTextArea.nextMatch();
+        fileActionsPanel.addNextMatchButtonListener(listener);
+        searchMenu.addNextMatchMenuItemListener(listener);
+    }
+
+    private void setUseRegExListener() {
+        ActionListener menuItemListener = e -> {
+            fileActionsPanel.setRegex(true);
+        };
+        searchMenu.addUseRegExpMenuItemListener(menuItemListener);
+    }
+
 }
 
 

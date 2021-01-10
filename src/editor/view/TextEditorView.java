@@ -1,6 +1,8 @@
-package editor;
+package editor.view;
 
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
+import java.util.Optional;
 
 public interface TextEditorView {
 
@@ -12,9 +14,7 @@ public interface TextEditorView {
 
     String getText();
 
-    String getFileName();
+    Optional<Path> getOpenPath();
 
-    void closeView();
-
-    void setCloseActionListener(ActionListener listener);
+    Optional<Path> getSavePath();
 }
