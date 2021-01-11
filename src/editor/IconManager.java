@@ -1,10 +1,9 @@
-package editor.view;
+package editor;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 public class IconManager {
     private static final String ICONS_DIR = String.join(File.separator, "Text Editor","task","icons");
@@ -36,7 +35,10 @@ public class IconManager {
 
     private static Icon openIcon(String iconName) {
         try {
-            return new ImageIcon(Files.readAllBytes(getPath(iconName)));
+            var iconFile = Files.readAllBytes(getPath(iconName));
+            var image = new ImageIcon(iconFile).getImage();
+            var icon = image.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+            return new ImageIcon(icon);
         } catch (Exception ignored) {
             return null;
         }

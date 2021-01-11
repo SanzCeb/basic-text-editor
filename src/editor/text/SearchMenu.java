@@ -1,4 +1,4 @@
-package editor.view;
+package editor.text;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;

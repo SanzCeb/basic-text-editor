@@ -1,20 +1,18 @@
 package editor;
 
-import editor.view.*;
-
+import editor.io.*;
+import editor.text.*;
 import javax.swing.*;
 import java.awt.*;
+import java.nio.file.*;
 import java.awt.event.ActionListener;
-import java.nio.file.Path;
-import java.util.Optional;
 
-public class TextEditor extends JFrame implements TextEditorView {
-    private static final TextEditorController CONTROLLER = new TextEditorController();
+public class TextEditor extends JFrame {
     private final FileMenu fileMenu = new FileMenu();
     private final SearchMenu searchMenu = new SearchMenu();
     private ScrollableTextArea scrollableTextArea;
     private FileActionsPanel fileActionsPanel;
-    private TextEditorFileChooser fileChooser = new TextEditorFileChooser();
+    private FileChooser fileChooser = new FileChooser();
 
     public TextEditor() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -34,14 +32,9 @@ public class TextEditor extends JFrame implements TextEditorView {
         getJMenuBar().add(fileMenu);
         getJMenuBar().add(searchMenu);
 
-        CONTROLLER.setView(this);
-        CONTROLLER.setModel(new Text());
-
-        fileMenu.addExitMenuItemListener(e -> {
-            dispose();
-            System.exit(0);
-        });
-
+        setExitActionListener();
+        setLoadActionListener();
+        setSaveActionListener();
         setStartSearchListener();
         setPreviousMatchListener();
         setNextMatchListener();
@@ -49,37 +42,30 @@ public class TextEditor extends JFrame implements TextEditorView {
         setVisible(true);
     }
 
-    @Override
-    public void setLoadActionListener(ActionListener listener) {
+    private void setExitActionListener() {
+        fileMenu.addExitMenuItemListener(e -> {
+            dispose();
+            System.exit(0);
+        });
+    }
 
+    private void setLoadActionListener() {
+        ActionListener listener = e -> fileChooser
+                .openFile()
+                .map(FileLoader::new)
+                .ifPresent(SwingWorker::execute);
         fileActionsPanel.addLoadButtonListener(listener);
         fileMenu.addLoadMenuItemListener(listener);
     }
 
-    @Override
-    public void setSaveActionListener(ActionListener listener) {
-
+    private void setSaveActionListener() {
+        ActionListener listener = e ->
+                fileChooser.saveFile()
+                        .map(FileSaver::new)
+                        .map(Thread::new)
+                        .ifPresent(Thread::start);
         fileActionsPanel.addSaveButtonListener(listener);
         fileMenu.addSaveMenuItemListener(listener);
-    }
-
-    public void setText(String text) {
-        scrollableTextArea.setText(text);
-    }
-
-    @Override
-    public String getText() {
-        return scrollableTextArea.getText();
-    }
-
-    @Override
-    public Optional<Path> getOpenPath() {
-        return fileChooser.openFile();
-    }
-
-    @Override
-    public Optional<Path> getSavePath() {
-        return fileChooser.saveFile();
     }
 
     private void setStartSearchListener() {
@@ -112,6 +98,45 @@ public class TextEditor extends JFrame implements TextEditorView {
         searchMenu.addUseRegExpMenuItemListener(menuItemListener);
     }
 
+    private class FileLoader extends SwingWorker<String, Object> {
+        private final Path path;
+        FileLoader(Path path) {
+            this.path = path;
+        }
+        @Override
+        protected String doInBackground() {
+            try {
+                return Files.readString(path);
+            } catch (Exception ignored) {
+                return "";
+            }
+        }
+        @Override
+        protected void done() {
+            try {
+                scrollableTextArea.setText(get());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class FileSaver implements Runnable {
+        private final Path path;
+        public FileSaver(Path path) {
+            this.path = path;
+        }
+        @Override
+        public void run() {
+            try {
+                var text = scrollableTextArea.getText();
+                Files.deleteIfExists(path);
+                Files.writeString(path, text, StandardOpenOption.CREATE_NEW);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
 
 

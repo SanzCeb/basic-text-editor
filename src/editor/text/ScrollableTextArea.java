@@ -1,4 +1,4 @@
-package editor.view;
+package editor.text;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;

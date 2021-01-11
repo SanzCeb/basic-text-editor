@@ -1,12 +1,12 @@
-package editor.view;
+package editor.io;
 
 import javax.swing.*;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class TextEditorFileChooser extends JFileChooser {
-    public TextEditorFileChooser() {
+public class FileChooser extends JFileChooser {
+    public FileChooser() {
         setName("FileChooser");
     }
 

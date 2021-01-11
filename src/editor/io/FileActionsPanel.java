@@ -1,12 +1,11 @@
-package editor.view;
+package editor.io;
+
+import editor.IconManager;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class FileActionsPanel extends Box {
 
